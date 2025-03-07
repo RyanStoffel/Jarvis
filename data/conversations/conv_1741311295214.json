@@ -1,0 +1,17 @@
+{
+    "messages": [
+        {
+            "role": "user",
+            "content": "create notes from this file called test and save it in physics",
+            "timestamp": "2025-03-06T17:35:49.909490"
+        },
+        {
+            "role": "assistant",
+            "content": "Note saved as 200-Classes/201-Physics/test.md.",
+            "timestamp": "2025-03-06T17:35:49.909490"
+        }
+    ],
+    "id": "conv_1741311295214",
+    "last_updated": "2025-03-06T17:35:49.909490",
+    "title": "create notes from this file called test and save i..."
+}

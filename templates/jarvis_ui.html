@@ -373,6 +373,22 @@
         color: #a0aec0;
       }
 
+      .upload-button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 18px;
+        margin-left: 8px;
+        margin-right: 8px;
+        color: #718096;
+        transition: all 0.2s;
+      }
+
+      .upload-button:hover {
+        color: var(--primary-color);
+        transform: scale(1.1);
+      }
+
       .send-button {
         position: absolute;
         right: 8px;
@@ -483,6 +499,34 @@
       .suggestion-desc {
         font-size: 14px;
         color: #666;
+      }
+
+      /* File upload progress and preview */
+      .file-preview {
+        margin-top: 10px;
+        padding: 15px;
+        background-color: rgba(58, 123, 213, 0.1);
+        border-radius: 10px;
+        font-size: 14px;
+      }
+
+      .file-preview-title {
+        font-weight: bold;
+        margin-bottom: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .file-preview-content {
+        max-height: 150px;
+        overflow-y: auto;
+        background-color: white;
+        padding: 10px;
+        border-radius: 6px;
+        white-space: pre-wrap;
+        font-family: monospace;
+        font-size: 12px;
       }
 
       /* Settings Modal */
@@ -722,6 +766,84 @@
         color: #888;
       }
 
+      /* Input container that holds everything */
+      .input-container {
+        position: relative;
+        display: flex;
+        align-items: center;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        background-color: var(--input-bg);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s;
+      }
+
+      /* Input field styling */
+      .input-field {
+        flex: 1;
+        border: none;
+        border-radius: 12px;
+        padding: 14px 90px 14px 16px; /* Add right padding to make room for buttons */
+        font-size: 16px;
+        line-height: 1.5;
+        resize: none;
+        height: 52px;
+        max-height: 200px;
+        overflow-y: auto;
+        background-color: transparent;
+        outline: none;
+      }
+
+      /* Upload button positioning and styling */
+      .upload-button {
+        position: absolute;
+        right: 54px; /* Position to the left of send button */
+        bottom: 8px;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: #f3f4f6;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #4b5563;
+        transition: all 0.2s;
+        z-index: 2; /* Ensure it's above the textarea */
+      }
+
+      .upload-button:hover {
+        transform: scale(1.1);
+        background: #e5e7eb;
+        color: var(--primary-color);
+      }
+
+      /* Send button positioning and styling */
+      .send-button {
+        position: absolute;
+        right: 8px;
+        bottom: 8px;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: var(--primary-gradient);
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        transition: all 0.2s;
+        box-shadow: 0 2px 5px rgba(58, 123, 213, 0.3);
+        z-index: 2; /* Ensure it's above the textarea */
+      }
+
+      .send-button:hover {
+        transform: scale(1.1);
+        box-shadow: 0 2px 8px rgba(58, 123, 213, 0.5);
+      }
+
       @keyframes typingAnimation {
         0%,
         60%,
@@ -823,7 +945,7 @@
 
       <div class="sidebar-footer">
         <div class="user">Obsidian AI</div>
-        <div class="version">v2.0</div>
+        <div class="version">v2.1</div>
       </div>
     </div>
 
@@ -915,6 +1037,25 @@
               placeholder="Ask Jarvis something..."
               rows="1"
             ></textarea>
+
+            <!-- Hidden file input for uploads -->
+            <input
+              type="file"
+              id="file-input"
+              style="display: none"
+              accept=".pdf,.txt,.docx,.md"
+            />
+
+            <!-- Upload button -->
+            <button
+              id="upload"
+              class="upload-button"
+              title="Upload file (PDF, DOCX, TXT)"
+            >
+              <i class="fas fa-file-upload"></i>
+            </button>
+
+            <!-- Send button -->
             <button id="send" class="send-button">
               <i class="fas fa-paper-plane"></i>
             </button>
@@ -1053,9 +1194,14 @@
       const generateNotesButton = document.getElementById("generate-notes");
       const searchVaultButton = document.getElementById("search-vault");
 
+      // File upload elements
+      const fileInput = document.getElementById("file-input");
+      const uploadButton = document.getElementById("upload");
+
       // State variables
       let conversationStarted = false;
       let currentConversationId = null;
+      let lastUploadedFile = null;
       let userSettings = {
         theme: "default",
         preferred_model: "gpt-3.5-turbo",
@@ -1081,6 +1227,9 @@
 
         // Set up event listeners
         setupEventListeners();
+
+        // Add file upload suggestion to welcome screen
+        addFileUploadSuggestion();
       }
 
       // Apply current settings to UI
@@ -1117,6 +1266,40 @@
           "small-font",
           userSettings.ui_options.font_size === "small",
         );
+      }
+
+      // Add file upload suggestion to the welcome screen
+      function addFileUploadSuggestion() {
+        const suggestionGrid = document.querySelector(".suggestion-grid");
+        if (suggestionGrid) {
+          // Create new suggestion item for file upload
+          const fileUploadItem = document.createElement("div");
+          fileUploadItem.classList.add("suggestion-item");
+          fileUploadItem.innerHTML = `
+            <div class="suggestion-icon">
+              <i class="fas fa-file-upload"></i>
+            </div>
+            <div class="suggestion-title">Upload & Analyze File</div>
+            <div class="suggestion-desc">
+              Upload a PDF or document to extract and analyze content
+            </div>
+          `;
+
+          // Add click handler to trigger file upload
+          fileUploadItem.addEventListener("click", () => {
+            fileInput.click();
+          });
+
+          // Add to the grid (replace the last item or add if there's space)
+          if (suggestionGrid.children.length >= 4) {
+            suggestionGrid.replaceChild(
+              fileUploadItem,
+              suggestionGrid.lastElementChild,
+            );
+          } else {
+            suggestionGrid.appendChild(fileUploadItem);
+          }
+        }
       }
 
       // Setup Event Listeners
@@ -1202,10 +1385,68 @@
 
         generateNotesButton.addEventListener("click", function () {
           startConversation();
-          addMessage(
-            "assistant",
-            'To generate notes, please paste the content you want to take notes on, and tell me what to call the notes and where to save them. For example:\n\n"Create notes for this [pasted content] called Introduction to Python, save it in Programming folder"',
-          );
+          if (lastUploadedFile) {
+            addMessage(
+              "assistant",
+              `I see you've uploaded "${lastUploadedFile.name}". To generate notes from this file, please tell me what to call the notes and where to save them. For example:\n\n"Create notes from this file called Introduction to Python, save it in Programming folder"`,
+            );
+          } else {
+            addMessage(
+              "assistant",
+              'To generate notes, you can either:\n\n1. Upload a PDF, DOCX, or TXT file using the upload button, or\n\n2. Paste the content you want to take notes on, and tell me what to call the notes and where to save them. For example:\n\n"Create notes for this [pasted content] called Introduction to Python, save it in Programming folder"',
+            );
+          }
+        });
+
+        // File upload event listeners
+        uploadButton.addEventListener("click", () => {
+          fileInput.click();
+        });
+
+        fileInput.addEventListener("change", (event) => {
+          const file = event.target.files[0];
+          if (file) {
+            // Show a temporary message to indicate upload is in progress
+            addMessage("user", `Uploading file: ${file.name}...`);
+
+            const formData = new FormData();
+            formData.append("file", file);
+
+            fetch("/upload", {
+              method: "POST",
+              body: formData,
+            })
+              .then((response) => response.json())
+              .then((data) => {
+                if (data.status === "success") {
+                  // Remove the temporary upload message
+                  chatDiv.removeChild(chatDiv.lastChild);
+
+                  // Show successful upload message with preview
+                  addMessage("user", `Uploaded file: ${file.name}`);
+                  addMessage(
+                    "assistant",
+                    `I've successfully processed your file. Here's a preview of the extracted content:\n\n${data.text_preview}\n\nYou can now create notes from this file by saying something like "Create notes from this file called [Title] and save it in [Folder]".`,
+                  );
+
+                  // Save reference to the uploaded file for later use
+                  lastUploadedFile = {
+                    name: file.name,
+                    path: data.text_path,
+                    text: data.text_preview,
+                  };
+                } else {
+                  addMessage(
+                    "assistant",
+                    `Error processing file: ${data.message}`,
+                  );
+                }
+              })
+              .catch((error) => {
+                console.error("Error uploading file:", error);
+                addMessage("assistant", `Error uploading file: ${error}`);
+              });
+          }
         });
 
         // Close modals when clicking outside
@@ -1223,6 +1464,7 @@
         chatDiv.style.display = "none";
         conversationStarted = false;
         currentConversationId = null;
+        lastUploadedFile = null; // Reset last uploaded file
       }
 
       // Clear current conversation
@@ -1231,7 +1473,7 @@
         welcomeScreen.style.display = "flex";
         chatDiv.style.display = "none";
         conversationStarted = false;
-        // Keep the conversation ID for history
+        lastUploadedFile = null; // Reset last uploaded file
       }
 
       // Start or continue conversation
@@ -1240,8 +1482,6 @@
           welcomeScreen.style.display = "none";
           chatDiv.style.display = "block";
           conversationStarted = true;
-
-          // Generate a new conversation ID if we don't have one
           if (!currentConversationId) {
             currentConversationId = "conv_" + Date.now();
           }
@@ -1257,13 +1497,11 @@
         const bubble = document.createElement("div");
         bubble.classList.add("message-bubble");
 
-        // For user messages, don't show label to make it cleaner
         if (role === "assistant") {
           const assistantLabel = document.createElement("div");
           assistantLabel.classList.add("message-role");
           assistantLabel.textContent = "Jarvis";
 
-          // Add timestamp if enabled
           if (userSettings.ui_options.show_timestamps) {
             const timestamp = document.createElement("span");
             timestamp.classList.add("message-timestamp");
@@ -1275,7 +1513,6 @@
               });
             assistantLabel.appendChild(timestamp);
           }
-
           container.appendChild(assistantLabel);
         }
 
@@ -1320,28 +1557,21 @@
         startConversation();
         const typingContainer = showTypingIndicator();
 
-        // Get typing speed from settings
-        let typingSpeed = 10; // Default (medium)
+        let typingSpeed = 10;
         if (userSettings.typing_speed === "slow") typingSpeed = 20;
         if (userSettings.typing_speed === "fast") typingSpeed = 2;
 
-        // For instant mode, skip the animation
         if (userSettings.typing_speed === "instant") {
           chatDiv.removeChild(typingContainer);
           addMessage(role, text);
           return;
         }
 
-        // Wait a moment to show the typing indicator
         setTimeout(() => {
-          // Remove typing indicator
           chatDiv.removeChild(typingContainer);
-
-          // Add the actual message
           const { container, bubble } = createMessageElement(role, "");
           chatDiv.appendChild(container);
 
-          // If voice is enabled, speak the response
           if (userSettings.voice_enabled && window.speechSynthesis) {
             const utterance = new SpeechSynthesisUtterance(text);
             window.speechSynthesis.speak(utterance);
@@ -1356,7 +1586,6 @@
               setTimeout(type, typingSpeed);
             }
           }
-
           type();
         }, 1200);
       }
@@ -1365,7 +1594,6 @@
       function sendMessage() {
         const text = inputField.value.trim();
         if (!text) return;
-
         addMessage("user", text);
         inputField.value = "";
         inputField.style.height = "52px";
@@ -1381,8 +1609,6 @@
           .then((response) => response.json())
           .then((data) => {
             typeMessage("assistant", data.response);
-
-            // Update conversation ID if we got a new one
             if (data.conversation_id) {
               currentConversationId = data.conversation_id;
             }
@@ -1395,9 +1621,7 @@
         fetch("/conversations")
           .then((response) => response.json())
           .then((conversations) => {
-            // Clear current list
             conversationsList.innerHTML = "";
-
             if (conversations && conversations.length > 0) {
               conversations.forEach((conv) => {
                 const item = document.createElement("div");
@@ -1410,8 +1634,6 @@
 
                 const time = document.createElement("div");
                 time.classList.add("conversation-time");
-
-                // Format the date
                 let dateStr = "Unknown date";
                 if (conv.last_updated) {
                   const date = new Date(conv.last_updated);
@@ -1433,9 +1655,7 @@
                 item.appendChild(time);
                 item.appendChild(preview);
 
-                // Add click handler to load conversation
                 item.addEventListener("click", () => loadConversation(conv.id));
-
                 conversationsList.appendChild(item);
               });
             } else {
@@ -1455,10 +1675,7 @@
         fetch(`/conversations?id=${id}`)
           .then((response) => response.json())
           .then((conversation) => {
-            // Clear current chat
             chatDiv.innerHTML = "";
-
-            // Display messages
             if (
               conversation &&
               conversation.messages &&
@@ -1467,14 +1684,8 @@
               conversation.messages.forEach((msg) => {
                 addMessage(msg.role, msg.content);
               });
-
-              // Set current conversation ID
               currentConversationId = id;
-
-              // Start conversation view
               startConversation();
-
-              // Close the panel
               closeConversationsPanel();
             }
           })
@@ -1487,7 +1698,7 @@
       // Open settings modal
       function openSettingsModal() {
         settingsModal.style.display = "block";
-        sidebar.classList.remove("show"); // Close sidebar on mobile
+        sidebar.classList.remove("show");
       }
 
       // Close settings modal
@@ -1497,7 +1708,6 @@
 
       // Save settings
       function saveSettings() {
-        // Gather settings from form
         const newSettings = {
           theme: document.getElementById("theme-select").value,
           preferred_model: document.getElementById("model-select").value,
@@ -1513,7 +1723,6 @@
           },
         };
 
-        // Save to server
         fetch("/settings", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -1545,7 +1754,7 @@
           closeConversationsPanel();
         } else {
           conversationsPanel.style.display = "block";
-          sidebar.classList.remove("show"); // Close sidebar on mobile
+          sidebar.classList.remove("show");
           loadConversationHistory();
         }
       }

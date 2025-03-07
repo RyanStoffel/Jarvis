@@ -1,11 +1,16 @@
 import datetime
 import json
+import mimetypes
 import os
 import re
+import tempfile
 
+import docx
+import PyPDF2
 from dotenv import load_dotenv
 from flask import Flask, jsonify, render_template_string, request, send_from_directory
 from openai import OpenAI
+from werkzeug.utils import secure_filename
 
 from jarvis_settings import (
     apply_theme,
@@ -40,6 +45,12 @@ if not os.path.exists(DATA_DIR):
 CONVERSATIONS_DIR = os.path.join(DATA_DIR, "conversations")
 if not os.path.exists(CONVERSATIONS_DIR):
     os.makedirs(CONVERSATIONS_DIR)
+
+# Define allowed file extensions and create upload directory
+ALLOWED_EXTENSIONS = {"pdf", "txt", "docx", "md"}
+UPLOAD_FOLDER = os.path.join(DATA_DIR, "uploads")
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -125,6 +136,55 @@ except FileNotFoundError:
     # Save this template
     with open(os.path.join(templates_dir, "jarvis_ui.html"), "w") as f:
         f.write(HTML_TEMPLATE)
+
+
+# --- Helper Functions for File Handling ---
+def allowed_file(filename):
+    """Check if the uploaded file has an allowed extension."""
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+def extract_text_from_pdf(file_path):
+    """Extract text from a PDF file."""
+    text = ""
+    try:
+        with open(file_path, "rb") as file:
+            pdf_reader = PyPDF2.PdfReader(file)
+            for page_num in range(len(pdf_reader.pages)):
+                text += pdf_reader.pages[page_num].extract_text() + "\n\n"
+        return text
+    except Exception as e:
+        return f"Error extracting text from PDF: {e}"
+
+
+def extract_text_from_docx(file_path):
+    """Extract text from a DOCX file."""
+    text = ""
+    try:
+        doc = docx.Document(file_path)
+        for para in doc.paragraphs:
+            text += para.text + "\n"
+        return text
+    except Exception as e:
+        return f"Error extracting text from DOCX: {e}"
+
+
+def extract_text_from_file(file_path):
+    """Extract text from various file types."""
+    file_extension = os.path.splitext(file_path)[1].lower()
+
+    if file_extension == ".pdf":
+        return extract_text_from_pdf(file_path)
+    elif file_extension == ".docx":
+        return extract_text_from_docx(file_path)
+    elif file_extension in [".txt", ".md"]:
+        try:
+            with open(file_path, "r", encoding="utf-8") as file:
+                return file.read()
+        except Exception as e:
+            return f"Error reading text file: {e}"
+    else:
+        return "Unsupported file format."
 
 
 # --- Helper Functions for Folder Resolution ---
@@ -293,13 +353,13 @@ def parse_command(user_input):
         '- "append": add content to the end of a file. Parameters: "filename" and "content".\n'
         '- "create": create a new file. Parameters: "filename" and "content".\n'
         '- "assignment": add an assignment to the todo list (append to "todo.md"). Parameter: "assignment".\n'
-        '- "generate_note": generate detailed markdown notes based on provided content. Parameters: "source", "note_title", '
-        'optionally "location", and optionally "followup".\n'
+        '- "generate_note": generate detailed markdown notes based on provided content or uploaded file. Parameters: "source", "note_title", '
+        'optionally "location", optionally "followup", and optionally "uploaded_file".\n'
         '- "settings": user wants to adjust Jarvis settings. Parameter: "action" (e.g., "show", "theme").\n'
         '- "vault": explore or manage the vault structure. Parameter: "action" (e.g., "show", "browse").\n'
         '- "chat": for any other conversation. Parameter: "message".\n'
-        'For note generation, trigger if the input includes phrases like "create markdown notes", "take notes", or "create a note". '
-        'Extract the source content, desired note title (indicated by words like "called" or "titled"), the location (indicated by "save it in"), '
+        'For note generation, trigger if the input includes phrases like "create markdown notes", "take notes", "create a note", or "make notes from file". '
+        'Extract the source content, the uploaded file (if mentioned), desired note title (indicated by words like "called" or "titled"), the location (indicated by "save it in"), '
         'and an optional continuation (indicated by "continue on to").\n'
         "Examples:\n"
         'Input: "Show me my to do list"\n'
@@ -312,6 +372,8 @@ def parse_command(user_input):
         'Output: {"action": "vault", "action": "show"}\n'
         'Input: "Create markdown notes for this <pasted content> called 8.2 Selection Sort, save it in data structures, continue on to 8.4 Shell Sort"\n'
         'Output: {"action": "generate_note", "source": "<pasted content>", "note_title": "8.2 Selection Sort.md", "location": "data structures", "followup": "8.4 Shell Sort"}\n'
+        'Input: "Make notes from my uploaded PDF file called Quantum Computing Basics, save in Physics"\n'
+        'Output: {"action": "generate_note", "source": "", "uploaded_file": true, "note_title": "Quantum Computing Basics.md", "location": "Physics"}\n'
         'Input: "Hello, how are you?"\n'
         'Output: {"action": "chat", "message": "Hello, how are you?"}\n'
         "Now parse the following input:\n"
@@ -342,6 +404,47 @@ def send_static(path):
     Serve static files (JS, CSS, images).
     """
     return send_from_directory("static", path)
+
+
+@app.route("/upload", methods=["POST"])
+def upload_file():
+    """Handle file uploads."""
+    if "file" not in request.files:
+        return jsonify({"status": "error", "message": "No file part"})
+
+    file = request.files["file"]
+    if file.filename == "":
+        return jsonify({"status": "error", "message": "No selected file"})
+
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        file_path = os.path.join(UPLOAD_FOLDER, filename)
+        file.save(file_path)
+
+        # Extract text based on file type
+        extracted_text = extract_text_from_file(file_path)
+
+        # Store the text in a session or cache for later use
+        # For simplicity, we'll save it to a temporary file
+        temp_text_file = os.path.join(UPLOAD_FOLDER, f"text_{filename}.txt")
+        with open(temp_text_file, "w", encoding="utf-8") as f:
+            f.write(extracted_text)
+
+        return jsonify(
+            {
+                "status": "success",
+                "message": "File uploaded successfully",
+                "filename": filename,
+                "text_preview": (
+                    extracted_text[:500] + "..."
+                    if len(extracted_text) > 500
+                    else extracted_text
+                ),
+                "text_path": temp_text_file,
+            }
+        )
+
+    return jsonify({"status": "error", "message": "File type not allowed"})
 
 
 @app.route("/message", methods=["POST"])
@@ -384,8 +487,11 @@ def message():
         followup = command.get("followup", "")
         note_title = command.get("note_title", "generated_note.md")
         location = command.get("location", "")
+        uploaded_file = command.get("uploaded_file", False)
 
-        result = handle_note_generation(source, followup, note_title, location)
+        result = handle_note_generation(
+            source, followup, note_title, location, uploaded_file
+        )
 
     elif command.get("action") == "settings":
         global app_settings
@@ -509,10 +615,25 @@ def conversations_route():
         return jsonify({"status": "error", "message": "No conversation ID provided"})
 
 
-def handle_note_generation(source, followup, note_title, location):
+def handle_note_generation(source, followup, note_title, location, uploaded_file=None):
     """
-    Handle the generation and saving of notes.
+    Handle the generation and saving of notes from pasted content or uploaded files.
     """
+    # If we're using an uploaded file and the source is empty, get the text from the latest uploaded file
+    if not source and uploaded_file:
+        # Find the most recent text file in the uploads directory
+        text_files = [f for f in os.listdir(UPLOAD_FOLDER) if f.startswith("text_")]
+        if text_files:
+            latest_file = max(
+                text_files,
+                key=lambda f: os.path.getmtime(os.path.join(UPLOAD_FOLDER, f)),
+            )
+            with open(
+                os.path.join(UPLOAD_FOLDER, latest_file), "r", encoding="utf-8"
+            ) as f:
+                source = f.read()
+
+    # Now we have the source content, proceed with note generation
     note_content = generate_note(source, followup)
 
     if not note_title.lower().endswith(".md"):

@@ -1,0 +1,47 @@
+{
+    "messages": [
+        {
+            "role": "user",
+            "content": "Show me my vault structure",
+            "timestamp": "2025-03-05T23:27:48.726600"
+        },
+        {
+            "role": "assistant",
+            "content": "Invalid command.",
+            "timestamp": "2025-03-05T23:27:48.726600"
+        },
+        {
+            "role": "user",
+            "content": "I'd like to search my vault for:Quicksort",
+            "timestamp": "2025-03-05T23:28:02.070893"
+        },
+        {
+            "role": "assistant",
+            "content": "I found matches in these files:\n- 200-Classes/227-Data Structures/8.4-Shell-Sort.md\n- 200-Classes/227-Data Structures/8.5 Quicksort.md",
+            "timestamp": "2025-03-05T23:28:02.070893"
+        },
+        {
+            "role": "user",
+            "content": "Show me my to-do list",
+            "timestamp": "2025-03-05T23:28:09.488664"
+        },
+        {
+            "role": "assistant",
+            "content": "Here's the content of todo.md:\n\n- [ ] Finish converting all my notes from handwritten to markdown files.\n\t- [x] [[7.1 Map ADT]]\n\t- [x] [[Lecture 1 - OS and Networking]]\n\t- [ ] [[Lecture 1 - Physics]]\n- [ ] Work on a new portfolio website, make completely from hand, no copying or pasting.\n- [x] Organize Files on my Mac\n- [x] Physics HW - Chapter 7 Problems\n- [x] Physics HW - Chapter 8 Early Stuff\n- [ ] Finish chapter 8 -> [[8.1 Sorting - Introduction]] in zyBooks for Data Structures\n- [ ] Finish Jarvis",
+            "timestamp": "2025-03-05T23:28:09.488664"
+        },
+        {
+            "role": "user",
+            "content": "Show me my to-do list",
+            "timestamp": "2025-03-05T23:28:27.131027"
+        },
+        {
+            "role": "assistant",
+            "content": "Here's the content of todo.md:\n\n- [ ] Finish converting all my notes from handwritten to markdown files.\n\t- [x] [[7.1 Map ADT]]\n\t- [x] [[Lecture 1 - OS and Networking]]\n\t- [ ] [[Lecture 1 - Physics]]\n- [ ] Work on a new portfolio website, make completely from hand, no copying or pasting.\n- [x] Organize Files on my Mac\n- [x] Physics HW - Chapter 7 Problems\n- [x] Physics HW - Chapter 8 Early Stuff\n- [ ] Finish chapter 8 -> [[8.1 Sorting - Introduction]] in zyBooks for Data Structures\n- [ ] Finish Jarvis",
+            "timestamp": "2025-03-05T23:28:27.131027"
+        }
+    ],
+    "id": "conv_1741246067573",
+    "last_updated": "2025-03-05T23:28:27.131027",
+    "title": "Show me my vault structure"
+}

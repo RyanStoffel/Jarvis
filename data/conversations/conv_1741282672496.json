@@ -1,0 +1,27 @@
+{
+    "messages": [
+        {
+            "role": "user",
+            "content": "add test to my to do list",
+            "timestamp": "2025-03-06T09:37:53.293672"
+        },
+        {
+            "role": "assistant",
+            "content": "I've added \"test\" to your to-do list.",
+            "timestamp": "2025-03-06T09:37:53.293672"
+        },
+        {
+            "role": "user",
+            "content": "I'd like to search my vault for:graph",
+            "timestamp": "2025-03-06T09:38:48.624370"
+        },
+        {
+            "role": "assistant",
+            "content": "I found matches in these files:\n- 200-Classes/227-Data Structures/Linked List.md\n- 200-Classes/227-Data Structures/7.9 Direct Hashing.md\n- 200-Classes/227-Data Structures/7.3 Chaining.md\n- 200-Classes/227-Data Structures/Data Structures.md\n- 200-Classes/227-Data Structures/7.10 Hashing Algorithms - Cryptography, Password Hashing.md\n- 200-Classes/227-Data Structures/5.4 Queue ADT.md\n- 200-Classes/227-Data Structures/Heap.md\n- 200-Classes/227-Data Structures/Hash Table.md\n- 200-Classes/227-Data Structures/3.1 Data Structures.md\n- 200-Classes/227-Data Structures/Graph.md\n- 200-Classes/226-OS & Networking/Lecture 4 - OS and Networking.md\n- 200-Classes/226-OS & Networking/Lecture 5 - OS and Networking.md\n- 200-Classes/201-Physics/Lecture 3 - Physics.md",
+            "timestamp": "2025-03-06T09:38:48.624370"
+        }
+    ],
+    "id": "conv_1741282672496",
+    "last_updated": "2025-03-06T09:38:48.624370",
+    "title": "add test to my to do list"
+}

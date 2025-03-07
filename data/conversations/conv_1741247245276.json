@@ -1,0 +1,27 @@
+{
+    "messages": [
+        {
+            "role": "user",
+            "content": "Show me my to-do list",
+            "timestamp": "2025-03-05T23:47:26.133628"
+        },
+        {
+            "role": "assistant",
+            "content": "Here's the content of todo.md:\n\n- [ ] Finish converting all my notes from handwritten to markdown files.\n\t- [x] [[7.1 Map ADT]]\n\t- [x] [[Lecture 1 - OS and Networking]]\n\t- [ ] [[Lecture 1 - Physics]]\n- [ ] Work on a new portfolio website, make completely from hand, no copying or pasting.\n- [x] Organize Files on my Mac\n- [x] Physics HW - Chapter 7 Problems\n- [x] Physics HW - Chapter 8 Early Stuff\n- [ ] Finish chapter 8 -> [[8.1 Sorting - Introduction]] in zyBooks for Data Structures\n- [ ] Finish Jarvis\n- [ ] Complete the project proposal",
+            "timestamp": "2025-03-05T23:47:26.133628"
+        },
+        {
+            "role": "user",
+            "content": "remove complete the project proposal from my to-do list",
+            "timestamp": "2025-03-05T23:47:55.856478"
+        },
+        {
+            "role": "assistant",
+            "content": "To remove \"complete the project proposal\" from your to-do list, navigate to your to-do list note in Obsidian. Locate the task, which is usually formatted with a checkbox (e.g., `- [ ] complete the project proposal`). You can mark it as complete by changing it to `- [x] complete the project proposal`, or simply delete the entire line if you prefer. Let me know if there's anything else I can assist with!",
+            "timestamp": "2025-03-05T23:47:55.856478"
+        }
+    ],
+    "id": "conv_1741247245276",
+    "last_updated": "2025-03-05T23:47:55.856478",
+    "title": "Show me my to-do list"
+}

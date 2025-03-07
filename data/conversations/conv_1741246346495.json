@@ -1,0 +1,27 @@
+{
+    "messages": [
+        {
+            "role": "user",
+            "content": "vault: show",
+            "timestamp": "2025-03-05T23:32:27.585239"
+        },
+        {
+            "role": "assistant",
+            "content": "Invalid command.",
+            "timestamp": "2025-03-05T23:32:27.585239"
+        },
+        {
+            "role": "user",
+            "content": "vault",
+            "timestamp": "2025-03-05T23:32:32.891743"
+        },
+        {
+            "role": "assistant",
+            "content": "Invalid command.",
+            "timestamp": "2025-03-05T23:32:32.891743"
+        }
+    ],
+    "id": "conv_1741246346495",
+    "last_updated": "2025-03-05T23:32:32.891743",
+    "title": "vault: show"
+}

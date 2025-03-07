@@ -1,0 +1,87 @@
+{
+    "messages": [
+        {
+            "role": "user",
+            "content": "I'd like to search my vault for:linked lists insert",
+            "timestamp": "2025-03-05T23:49:24.513152"
+        },
+        {
+            "role": "assistant",
+            "content": "No matches found for your search.",
+            "timestamp": "2025-03-05T23:49:24.513152"
+        },
+        {
+            "role": "user",
+            "content": "I'd like to search my vault for:linkedlist",
+            "timestamp": "2025-03-05T23:49:32.943958"
+        },
+        {
+            "role": "assistant",
+            "content": "I found matches in these files:\n- 200-Classes/227-Data Structures/Linked List.md\n- 200-Classes/227-Data Structures/4.8 Linked List Traversal.md\n- 200-Classes/227-Data Structures/4.6 Doubly Linked Lists - Search and Insert.md\n- 200-Classes/227-Data Structures/4.7 Doubly Linked Lists - Remove.md\n- 200-Classes/227-Data Structures/5.5 Queues Using Linked Lists.md\n- 200-Classes/227-Data Structures/Week 3 Lab - Singly Linked List Demo.md\n- 200-Classes/227-Data Structures/Week 4 Lab - Doubly Linked List Demo.md\n- 200-Classes/227-Data Structures/4.10 Sorting Linked Lists.md\n- 200-Classes/227-Data Structures/4.5 Doubly Linked Lists.md\n- 200-Classes/227-Data Structures/4.2 Singly Linked Lists.md",
+            "timestamp": "2025-03-05T23:49:32.943958"
+        },
+        {
+            "role": "user",
+            "content": "read those",
+            "timestamp": "2025-03-05T23:49:49.518953"
+        },
+        {
+            "role": "assistant",
+            "content": "Could you please specify which note or file you would like me to read? If you can provide the file name or its location in your vault, I'll be able to assist you better.",
+            "timestamp": "2025-03-05T23:49:49.518953"
+        },
+        {
+            "role": "user",
+            "content": "read linked list.md",
+            "timestamp": "2025-03-05T23:50:00.989468"
+        },
+        {
+            "role": "assistant",
+            "content": "I couldn't find linked list.md in your vault. Available files: ['todo.md', '200-Classes/227-Data Structures/8.1 Sorting - Introduction.md', '200-Classes/227-Data Structures/Linked List.md', '200-Classes/227-Data Structures/6.8 Recursive Algorithms.md', '200-Classes/227-Data Structures/4.8 Linked List Traversal.md', '200-Classes/227-Data Structures/7.7 Hash Table Resizing.md', '200-Classes/227-Data Structures/6.2 Binary Search.md', '200-Classes/227-Data Structures/6.6 Algorithm Analysis.md', '200-Classes/227-Data Structures/Hash Table Practice.md', '200-Classes/227-Data Structures/3.4 Abstract Data Types.md']",
+            "timestamp": "2025-03-05T23:50:00.989468"
+        },
+        {
+            "role": "user",
+            "content": "read Linked List.md",
+            "timestamp": "2025-03-05T23:50:16.833639"
+        },
+        {
+            "role": "assistant",
+            "content": "I couldn't find Linked List.md in your vault. Available files: ['todo.md', '200-Classes/227-Data Structures/8.1 Sorting - Introduction.md', '200-Classes/227-Data Structures/Linked List.md', '200-Classes/227-Data Structures/6.8 Recursive Algorithms.md', '200-Classes/227-Data Structures/4.8 Linked List Traversal.md', '200-Classes/227-Data Structures/7.7 Hash Table Resizing.md', '200-Classes/227-Data Structures/6.2 Binary Search.md', '200-Classes/227-Data Structures/6.6 Algorithm Analysis.md', '200-Classes/227-Data Structures/Hash Table Practice.md', '200-Classes/227-Data Structures/3.4 Abstract Data Types.md']",
+            "timestamp": "2025-03-05T23:50:16.833639"
+        },
+        {
+            "role": "user",
+            "content": "read 200-Classes/Linked List.md",
+            "timestamp": "2025-03-05T23:50:38.456759"
+        },
+        {
+            "role": "assistant",
+            "content": "I couldn't find 200-Classes/Linked List.md in your vault. Available files: ['todo.md', '200-Classes/227-Data Structures/8.1 Sorting - Introduction.md', '200-Classes/227-Data Structures/Linked List.md', '200-Classes/227-Data Structures/6.8 Recursive Algorithms.md', '200-Classes/227-Data Structures/4.8 Linked List Traversal.md', '200-Classes/227-Data Structures/7.7 Hash Table Resizing.md', '200-Classes/227-Data Structures/6.2 Binary Search.md', '200-Classes/227-Data Structures/6.6 Algorithm Analysis.md', '200-Classes/227-Data Structures/Hash Table Practice.md', '200-Classes/227-Data Structures/3.4 Abstract Data Types.md']",
+            "timestamp": "2025-03-05T23:50:38.456759"
+        },
+        {
+            "role": "user",
+            "content": "read 200-Classes/227-Data Structures/Linked List.md",
+            "timestamp": "2025-03-05T23:51:12.875349"
+        },
+        {
+            "role": "assistant",
+            "content": "Here's the content of 200-Classes/227-Data Structures/Linked List.md:\n\n## Definition\n\nA linked list is a linear data structure where elements (nodes) are stored in non-contiguous memory locations. Each node contains data and a reference (pointer) to the next node in the sequence.\n\n## Key Characteristics\n\n- **Dynamic Size**: Can grow or shrink during execution\n- **Non-Contiguous Memory**: Nodes can be scattered in memory\n- **Sequential Access**: Elements must be accessed sequentially\n- **No Random Access**: Cannot directly access elements by index\n- **Efficient Insertions/Deletions**: No need to shift elements\n\n## Types of Linked Lists\n\n### 1. Singly Linked List\n\n- Each node has data and a reference to the next node\n- Last node points to null/None\n- Only forward traversal is possible\n\n### 2. Doubly Linked List\n\n- Each node has data, a reference to the next node, and a reference to the previous node\n- First node's previous and last node's next point to null/None\n- Both forward and backward traversal are possible\n\n### 3. Circular Linked List\n\n- Last node points back to the first node instead of null\n- Can be singly or doubly linked\n- No specific start or end point\n\n## Node Structure\n\n### Singly Linked List Node\n\n```python\nclass Node:\n    def __init__(self, data):\n        self.data = data\n        self.next = None\n```\n\n### Doubly Linked List Node\n\n```python\nclass Node:\n    def __init__(self, data):\n        self.data = data\n        self.next = None\n        self.prev = None\n```\n\n## Basic Linked List Implementation (C++)\n\n### Singly Linked List\n\n```c++\n// Node class\nclass Node {\npublic:\n  int data;   // Data stored in the node\n  Node *next; // Pointer to the next node\n\n  // Constructor to initialize a node\n  Node(int value) : data(value), next(nullptr) {}\n};\n\n// LinkedList class\nclass LinkedList {\nprivate:\n  Node *head; // Pointer to the first node in the list\n  Node *tail; // Pointer to the last node in the list\n\npublic:\n  // Constructor to initialize an empty linked list\n  LinkedList() : head(nullptr), tail(nullptr) {}\n\n  // Declare the functions for linked list operations\n  void appendNode(int value) { // Append a node to the list\n    Node *newNode = new Node(value);\n    if (!head) {\n      head = tail = newNode;\n    } else {\n      tail->next = newNode;\n      tail = newNode;\n    }\n  }\n\n  void prependNode(int value) { // Prepend a node to the list\n    Node *newNode = new Node(value);\n    if (!head) {\n      head = tail = newNode;\n    } else {\n      head->next = newNode;\n      head = newNode;\n    }\n  }\n\n  void insertNodeAfter(int afterValue,\n                       int value) { // Insert after a given value\n    Node *curNode = head;\n    Node *newNode = new Node(value);\n    if (!head) {\n      head = tail = newNode;\n    }\n\n    while (curNode) {\n      if (curNode->data == afterValue) {\n        Node *sucNode = curNode->next;\n        newNode->next = sucNode;\n        curNode->next = newNode;\n      }\n      curNode = curNode->next;\n    }\n  }\n\n  void removeNodeAfter(int afterValue) { // Remove after a given value\n    if (tail->data == afterValue) {\n      cout << \"Cannot remove after the tail.\" << endl;\n    }\n\n    Node *curNode = head;\n    while (curNode) {\n      Node *sucNode = curNode->next;\n      if (curNode->data == afterValue) {\n        curNode->next = sucNode->next;\n        delete sucNode;\n        sucNode = nullptr;\n      }\n      curNode = curNode->next;\n    }\n  }\n\n  void deleteLastNode() { // Delete the last node\n    if (head == nullptr)\n      return;\n    if (head == tail) {\n      delete head;\n      head = nullptr;\n      tail = nullptr;\n    } else {\n      Node *curNode = head;\n      while (curNode->next != tail) {\n        curNode = curNode->next;\n      }\n      delete tail;\n      tail = curNode;\n      curNode->next = nullptr;\n    }\n  }\n\n  Node *searchNode(int value) { // Search for a node by value\n    Node *curNode = head;\n    while (curNode) {\n      if (curNode->data == value) {\n        cout << curNode->data << endl;\n        return curNode;\n      }\n      curNode = curNode->next;\n    }\n    return 0;\n  }\n\n  void printList() { // Print all elements in the list\n    Node *curNode = head;\n    while (curNode) {\n      cout << curNode->data << \" \";\n      curNode = curNode->next;\n    }\n    cout << endl;\n  }\n};\n```\n\n## Common Operations\n\n### Basic Operations\n\n1. **Insertion**:\n    \n    - Insert at beginning (prepend)\n    - Insert at end (append)\n    - Insert after a node\n    - Insert at position\n2. **Deletion**:\n    \n    - Delete from beginning\n    - Delete from end\n    - Delete a specific node\n    - Delete by position\n3. **Traversal**:\n    \n    - Visit each node sequentially\n4. **Search**:\n    \n    - Find a node with specific data\n\n### Advanced Operations\n\n1. **Reverse**: Reverse the order of nodes\n2. **Merge**: Combine two linked lists\n3. **Sort**: Arrange nodes in a specific order\n4. **Detect Cycle**: Check if a linked list has a cycle\n5. **Find Middle**: Find the middle node of a linked list\n\n## Time Complexity\n\n|Operation|Singly Linked List|Doubly Linked List|\n|---|---|---|\n|Access|O(n)|O(n)|\n|Search|O(n)|O(n)|\n|Insertion at beginning|O(1)|O(1)|\n|Insertion at end*|O(1) with tail pointer|O(1) with tail pointer|\n|Insertion at position|O(n)|O(n)|\n|Deletion at beginning|O(1)|O(1)|\n|Deletion at end*|O(n)|O(1) with double linking|\n|Deletion at position|O(n)|O(n)|\n\n* Assumes a tail pointer for tracking the end of the list\n\n## Space Complexity\n\n- O(n) where n is the number of elements\n- Each node requires extra memory for pointers (one in singly, two in doubly linked lists)\n\n## Advantages\n\n- **Dynamic Size**: Can grow and shrink as needed during execution\n- **Efficient Insertions/Deletions**: Constant time insertions at beginning and end\n- **No Wasted Memory**: Only allocates the memory needed\n- **No Shifting**: Inserting or deleting elements doesn't require shifting, unlike arrays\n- **Implementation of Other Data Structures**: Used to implement stacks, queues, etc.\n\n## Disadvantages\n\n- **No Random Access**: Must traverse from beginning to access elements\n- **Extra Memory**: Requires extra memory for storing pointers\n- **Traversal Time**: Sequential access takes O(n) time\n- **Reverse Traversal**: Difficult in singly linked lists\n- **Not Cache Friendly**: Nodes scattered in memory reduce cache performance\n\n## Applications\n\n- **Implementation of Stacks and Queues**\n- **Symbol Tables in Compiler Design**\n- **Dynamic Memory Allocation**\n- **Undo Functionality in Applications**\n- **Adjacency Lists for Graphs**\n- **Hash Tables (chaining for collision resolution)**\n- **Music Playlists**",
+            "timestamp": "2025-03-05T23:51:12.875349"
+        },
+        {
+            "role": "user",
+            "content": "Show me my to-do list",
+            "timestamp": "2025-03-05T23:53:17.393553"
+        },
+        {
+            "role": "assistant",
+            "content": "Here's the content of todo.md:\n\n- [ ] Finish converting all my notes from handwritten to markdown files.\n\t- [x] [[7.1 Map ADT]]\n\t- [x] [[Lecture 1 - OS and Networking]]\n\t- [ ] [[Lecture 1 - Physics]]\n- [ ] Work on a new portfolio website, make completely from hand, no copying or pasting.\n- [x] Organize Files on my Mac\n- [x] Physics HW - Chapter 7 Problems\n- [x] Physics HW - Chapter 8 Early Stuff\n- [ ] Finish chapter 8 -> [[8.1 Sorting - Introduction]] in zyBooks for Data Structures\n- [ ] Finish Jarvis",
+            "timestamp": "2025-03-05T23:53:17.393553"
+        }
+    ],
+    "id": "conv_1741247363588",
+    "last_updated": "2025-03-05T23:53:17.393553",
+    "title": "I'd like to search my vault for:linked lists inser..."
+}

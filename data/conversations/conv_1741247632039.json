@@ -1,0 +1,27 @@
+{
+    "messages": [
+        {
+            "role": "user",
+            "content": "add Add voice commands, and file uploading to Jarvis to my to do list",
+            "timestamp": "2025-03-05T23:53:53.096773"
+        },
+        {
+            "role": "assistant",
+            "content": "I've added \"Add voice commands, and file uploading to Jarvis\" to your to-do list.",
+            "timestamp": "2025-03-05T23:53:53.096773"
+        },
+        {
+            "role": "user",
+            "content": "add Fix some of the commands for Jarvis, make it more natural language based prompts to my to do list",
+            "timestamp": "2025-03-05T23:54:44.228537"
+        },
+        {
+            "role": "assistant",
+            "content": "I've added \"Fix some of the commands for Jarvis, make it more natural language based prompts\" to your to-do list.",
+            "timestamp": "2025-03-05T23:54:44.228537"
+        }
+    ],
+    "id": "conv_1741247632039",
+    "last_updated": "2025-03-05T23:54:44.228537",
+    "title": "add Add voice commands, and file uploading to Jarv..."
+}

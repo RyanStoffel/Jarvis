@@ -1,0 +1,15 @@
+{
+    "theme": "default",
+    "preferred_model": "gpt-4o",
+    "typing_speed": "medium",
+    "save_conversations": true,
+    "max_conversation_history": 50,
+    "auto_save_interval": 5,
+    "voice_enabled": false,
+    "ui_options": {
+        "font_size": "medium",
+        "compact_mode": true,
+        "show_timestamps": true,
+        "show_model_info": true
+    }
+}

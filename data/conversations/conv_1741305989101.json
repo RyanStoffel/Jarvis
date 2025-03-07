@@ -1,0 +1,17 @@
+{
+    "messages": [
+        {
+            "role": "user",
+            "content": "Show me my to-do list",
+            "timestamp": "2025-03-06T16:06:30.824628"
+        },
+        {
+            "role": "assistant",
+            "content": "Here's the content of todo.md:\n\n- [ ] Finish converting all my notes from handwritten to markdown files.\n\t- [x] [[7.1 Map ADT]]\n\t- [x] [[Lecture 1 - OS and Networking]]\n\t- [ ] [[Lecture 1 - Physics]]\n- [ ] Work on a new portfolio website, make completely from hand, no copying or pasting.\n- [x] Organize Files on my Mac\n- [x] Physics HW - Chapter 7 Problems\n- [x] Physics HW - Chapter 8 Early Stuff\n- [ ] Finish chapter 8 -> [[8.1 Sorting - Introduction]] in zyBooks for Data Structures\n- [ ] Finish Jarvis\n- [ ] Add voice commands, and file uploading to Jarvis\n- [ ] Fix some of the commands for Jarvis, make it more natural language based prompts",
+            "timestamp": "2025-03-06T16:06:30.824628"
+        }
+    ],
+    "id": "conv_1741305989101",
+    "last_updated": "2025-03-06T16:06:30.824628",
+    "title": "Show me my to-do list"
+}

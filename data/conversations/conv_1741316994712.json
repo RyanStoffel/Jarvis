@@ -1,0 +1,37 @@
+{
+    "messages": [
+        {
+            "role": "user",
+            "content": "hi",
+            "timestamp": "2025-03-06T19:09:56.560222"
+        },
+        {
+            "role": "assistant",
+            "content": "Hello! How can I assist you today with your notes or knowledge base?",
+            "timestamp": "2025-03-06T19:09:56.560222"
+        },
+        {
+            "role": "user",
+            "content": "who are you",
+            "timestamp": "2025-03-06T19:10:04.042139"
+        },
+        {
+            "role": "assistant",
+            "content": "I'm Jarvis, your AI assistant integrated with your Obsidian vault. I'm here to help you manage your notes, organize information, and make the most of your knowledge base. If you have any questions or need assistance, feel free to ask!",
+            "timestamp": "2025-03-06T19:10:04.042139"
+        },
+        {
+            "role": "user",
+            "content": "Show me my to-do list",
+            "timestamp": "2025-03-06T19:11:15.341003"
+        },
+        {
+            "role": "assistant",
+            "content": "Here's the content of todo.md:\n\n- [ ] Finish converting all my notes from handwritten to markdown files.\n\t- [x] [[7.1 Map ADT]]\n\t- [x] [[Lecture 1 - OS and Networking]]\n\t- [ ] [[Lecture 1 - Physics]]\n- [ ] Work on a new portfolio website, make completely from hand, no copying or pasting.\n- [x] Organize Files on my Mac\n- [x] Physics HW - Chapter 7 Problems\n- [x] Physics HW - Chapter 8 Early Stuff\n- [ ] Finish chapter 8 -> [[8.1 Sorting - Introduction]] in zyBooks for Data Structures\n- [ ] Finish Jarvis\n- [ ] Add voice commands, and file uploading to Jarvis\n- [ ] Fix some of the commands for Jarvis, make it more natural language based prompts",
+            "timestamp": "2025-03-06T19:11:15.341003"
+        }
+    ],
+    "id": "conv_1741316994712",
+    "last_updated": "2025-03-06T19:11:15.341003",
+    "title": "hi"
+}

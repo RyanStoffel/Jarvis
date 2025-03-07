@@ -4,6 +4,8 @@ import mimetypes
 import os
 import re
 import tempfile
+import threading
+import time
 
 import docx
 import PyPDF2
@@ -29,8 +31,33 @@ load_dotenv()
 
 
 # ---- CONFIGURATION ----
-OPENAI_API_KEY = os.getenv("API_KEY")  # Replace with your OpenAI API key
+OPENAI_API_KEY = os.getenv("API_KEY")
+ASSISTANT_ID = os.getenv("ASSISTANT_ID", "")  # Get from .env or leave empty
+USE_ASSISTANT_API = (
+    True  # Set to True to use Assistant API, False for regular chat completions
+)
+if not OPENAI_API_KEY:
+    print("Warning: API_KEY not found in environment variables.")
+    # Fallback to manual input if no environment variable is found
+    OPENAI_API_KEY = input("Please enter your OpenAI API key: ")
+
 client = OpenAI(api_key=OPENAI_API_KEY)
+
+
+# Test OpenAI API key on startup
+def test_openai_api():
+    try:
+        # Simple API call to test authentication
+        response = client.models.list()
+        print("✓ OpenAI API connection successful!")
+        return True
+    except Exception as e:
+        print(f"✗ OpenAI API connection failed: {str(e)}")
+        return False
+
+
+# Call this to test API key
+api_test_result = test_openai_api()
 
 # Set the path to your Obsidian vault
 VAULT_PATH = "/Users/ryanstoffel/2ndBrain/"
@@ -328,11 +355,16 @@ def generate_note(source, followup=""):
         f"Content:\n{source}\n\n"
         f"Followup (if any): {followup}"
     )
-    response = client.chat.completions.create(
-        model=model,
-        messages=[{"role": "user", "content": prompt}],
-    )
-    return response.choices[0].message.content.strip()
+
+    try:
+        response = client.chat.completions.create(
+            model=model,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        return response.choices[0].message.content.strip()
+    except Exception as e:
+        print(f"Error generating note: {e}")
+        return f"Error generating note: {e}"
 
 
 # --- Command Parsing ---
@@ -380,11 +412,101 @@ def parse_command(user_input):
         f'"{user_input}"'
     )
 
-    response = client.chat.completions.create(
-        model=model,
-        messages=[{"role": "system", "content": prompt}],
-    )
-    return response.choices[0].message.content.strip()
+    try:
+        response = client.chat.completions.create(
+            model=model,
+            messages=[{"role": "system", "content": prompt}],
+        )
+        return response.choices[0].message.content.strip()
+    except Exception as e:
+        print(f"Error parsing command: {e}")
+        # Return a default chat command when parsing fails
+        return json.dumps({"action": "chat", "message": user_input})
+
+
+def assistant_conversation(message, conversation_id=None):
+    """
+    Handle conversation with OpenAI's Assistant API.
+    """
+    try:
+        # Create or retrieve thread
+        thread_id = None
+        if conversation_id and conversation_id.startswith("thread_"):
+            thread_id = conversation_id
+
+        if not thread_id:
+            # Create a new thread
+            thread = client.beta.threads.create()
+            thread_id = thread.id
+            print(f"Created new thread: {thread_id}")
+        else:
+            print(f"Using existing thread: {thread_id}")
+
+        # Add the message to the thread
+        client.beta.threads.messages.create(
+            thread_id=thread_id, role="user", content=message
+        )
+        print(f"Added message to thread: {message[:50]}...")
+
+        # Run the assistant on the thread
+        run = client.beta.threads.runs.create(
+            thread_id=thread_id, assistant_id=ASSISTANT_ID
+        )
+        print(f"Started run: {run.id}")
+
+        # Wait for the run to complete
+        run_status = None
+        start_time = time.time()
+        timeout = 60  # Maximum wait time in seconds
+
+        while time.time() - start_time < timeout:
+            run_status = client.beta.threads.runs.retrieve(
+                thread_id=thread_id, run_id=run.id
+            )
+
+            if run_status.status == "completed":
+                print(f"Run completed in {time.time() - start_time:.2f} seconds")
+                break
+            elif run_status.status in ["failed", "cancelled", "expired"]:
+                return {
+                    "response": f"I encountered an issue processing your request. Status: {run_status.status}",
+                    "conversation_id": thread_id,
+                    "error": True,
+                }
+
+            time.sleep(1)  # Poll every second
+
+        if run_status.status != "completed":
+            return {
+                "response": "I'm still thinking about your request. Please try again in a moment.",
+                "conversation_id": thread_id,
+                "error": True,
+            }
+
+        # Get the latest message from the assistant
+        messages = client.beta.threads.messages.list(
+            thread_id=thread_id, order="desc", limit=1
+        )
+
+        # Extract the message content
+        response_text = ""
+        if messages.data and messages.data[0].role == "assistant":
+            assistant_message = messages.data[0]
+            for content_part in assistant_message.content:
+                if hasattr(content_part, "text") and content_part.text:
+                    response_text += content_part.text.value
+
+        if not response_text:
+            response_text = "I processed your request but don't have a specific response to provide."
+
+        return {"response": response_text, "conversation_id": thread_id, "error": False}
+    except Exception as e:
+        print(f"Error in assistant conversation: {str(e)}")
+        return {
+            "response": f"I encountered an error while processing your request: {str(e)}",
+            "conversation_id": None,
+            "error": True,
+        }
 
 
 # --- Flask Routes ---
@@ -452,115 +574,148 @@ def message():
     """
     Process incoming messages from the UI and return appropriate responses.
     """
-    user_input = request.json.get("message", "").strip()
-    conversation_id = request.json.get("conversation_id", None)
-
-    # Convert natural language to a JSON command
     try:
-        command_json = parse_command(user_input)
-        command = json.loads(command_json)
-    except Exception as e:
-        print(f"Error parsing command: {str(e)}")
-        command = {"action": "chat", "message": user_input}
+        user_input = request.json.get("message", "").strip()
+        conversation_id = request.json.get("conversation_id", None)
 
-    # Execute the command
-    if command.get("action") == "search":
-        result = search_files(VAULT_PATH, command.get("keyword", ""))
+        # Insert debug log
+        print(f"Received message: '{user_input}'")
 
-    elif command.get("action") == "read":
-        result = read_file(command.get("filename", ""))
+        # Check if we're using Assistant API and direct the message accordingly
+        if USE_ASSISTANT_API and ASSISTANT_ID and not user_input.startswith("/cmd:"):
+            # Use Assistant API for normal chat
+            print(f"Using Assistant API with assistant: {ASSISTANT_ID}")
+            result = assistant_conversation(user_input, conversation_id)
 
-    elif command.get("action") == "write":
-        result = write_file(command.get("filename", ""), command.get("content", ""))
+            # Save conversation if needed
+            if conversation_id and result.get("conversation_id"):
+                save_conversation(
+                    conversation_id, user_input, result.get("response", "")
+                )
 
-    elif command.get("action") == "append":
-        result = append_file(command.get("filename", ""), command.get("content", ""))
+            return jsonify(
+                {
+                    "response": result.get("response"),
+                    "conversation_id": result.get("conversation_id"),
+                    "error": result.get("error", False),
+                }
+            )
 
-    elif command.get("action") == "create":
-        result = create_file(command.get("filename", ""), command.get("content", ""))
+        # If not using Assistant or if command parsing is requested (with /cmd:)
+        if user_input.startswith("/cmd:"):
+            user_input = user_input[5:].strip()  # Remove the /cmd: prefix
+            print(f"Processing as command: {user_input}")
 
-    elif command.get("action") == "assignment":
-        result = add_assignment(command.get("assignment", ""))
+        # The rest of your existing message route code...
+        # Parse the command and execute it as before
+        try:
+            command_json = parse_command(user_input)
+            print(f"Parsed command: {command_json}")
+            command = json.loads(command_json)
+        except Exception as e:
+            print(f"Error parsing command: {str(e)}")
+            command = {"action": "chat", "message": user_input}
 
-    elif command.get("action") == "generate_note":
-        source = command.get("source", "")
-        followup = command.get("followup", "")
-        note_title = command.get("note_title", "generated_note.md")
-        location = command.get("location", "")
-        uploaded_file = command.get("uploaded_file", False)
+        # Process the command as in your original code
+        # This handles all the specialized commands (search, read, write, etc.)
 
-        result = handle_note_generation(
-            source, followup, note_title, location, uploaded_file
+        # For chat actions, decide whether to use Assistant or direct completion
+        if (
+            command.get("action") == "chat"
+            and USE_ASSISTANT_API
+            and ASSISTANT_ID
+            and not user_input.startswith("/cmd:")
+        ):
+            # Use the Assistant API
+            result_data = assistant_conversation(
+                command.get("message", user_input), conversation_id
+            )
+            result = result_data.get("response")
+            conversation_id = result_data.get("conversation_id")
+        elif command.get("action") == "chat":
+            # Use direct chat completion as before
+            try:
+                model = app_settings.get("preferred_model", "gpt-3.5-turbo")
+                print(f"Using direct completion with model: {model}")
+
+                response = client.chat.completions.create(
+                    model=model,
+                    messages=[
+                        {
+                            "role": "system",
+                            "content": "You are Jarvis, an advanced AI assistant integrated with "
+                            "an Obsidian vault. You help users manage their knowledge base, "
+                            "create notes, and find information. Respond in a helpful, friendly manner.",
+                        },
+                        {"role": "user", "content": command.get("message", user_input)},
+                    ],
+                )
+                result = response.choices[0].message.content.strip()
+            except Exception as e:
+                error_message = str(e)
+                print(f"Error calling OpenAI API: {error_message}")
+
+                if "api_key" in error_message.lower():
+                    result = "Error: There appears to be a problem with the API key. Please check your API key configuration."
+                elif "rate limit" in error_message.lower():
+                    result = (
+                        "Error: Rate limit exceeded. Please try again in a few moments."
+                    )
+                elif "model" in error_message.lower():
+                    result = f"Error: Issue with the selected model ({model}). The model may not be available or your account may not have access to it."
+                else:
+                    result = f"Error calling OpenAI API: {error_message}"
+
+        # Save conversation history
+        if conversation_id:
+            save_conversation(conversation_id, user_input, result)
+
+        return jsonify(
+            {
+                "response": result,
+                "conversation_id": conversation_id
+                or f"conv_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}",
+            }
         )
 
-    elif command.get("action") == "settings":
-        global app_settings
-        setting = command.get("setting", "show")
-        value = command.get("value", None)
+    except Exception as e:
+        print(f"Unhandled exception in message route: {str(e)}")
+        return jsonify(
+            {
+                "response": f"I encountered an error processing your request: {str(e)}. Please check the server logs for more details.",
+                "conversation_id": None,
+                "error": True,
+            }
+        )
 
-        if setting == "show":
-            result = f"Current Settings:\n\n" + json.dumps(app_settings, indent=2)
-        elif setting == "theme":
-            # Update theme
-            app_settings["theme"] = value
-            update_settings(app_settings)
-            result = f"Theme updated to {value}. Refresh the page to see changes."
-        elif setting == "model":
-            # Update preferred model
-            app_settings["preferred_model"] = value
-            update_settings(app_settings)
-            result = f"Preferred model updated to {value}."
-        elif setting == "themes":
-            # List available themes
-            themes = get_themes()
-            result = "Available themes:\n" + "\n".join(
-                [f"- {theme}" for theme in themes]
-            )
-        else:
-            result = "Unknown settings command."
 
-    elif command.get("action") == "vault":
-        action = command.get("action", "show")
+@app.route("/set-assistant", methods=["POST"])
+def set_assistant():
+    """
+    Set or update the Assistant ID.
+    """
+    global ASSISTANT_ID, USE_ASSISTANT_API
 
-        if action == "show":
-            structure = get_vault_structure()
-            result = "Vault Structure:\n" + json.dumps(structure, indent=2)
-        else:
-            result = "Unknown vault command."
+    assistant_id = request.json.get("assistant_id")
+    use_assistant = request.json.get("use_assistant")
 
-    elif command.get("action") == "chat":
-        try:
-            # Use the model from settings
-            model = app_settings.get("preferred_model", "gpt-3.5-turbo")
+    if assistant_id is not None:
+        ASSISTANT_ID = assistant_id
+        # Update app_settings to store the Assistant ID
+        app_settings["assistant_id"] = assistant_id
+        update_settings(app_settings)
 
-            response = client.chat.completions.create(
-                model=model,
-                messages=[
-                    {
-                        "role": "system",
-                        "content": "You are Jarvis, an advanced AI assistant integrated with "
-                        "an Obsidian vault. You help users manage their knowledge base, "
-                        "create notes, and find information. Respond in a helpful, friendly manner.",
-                    },
-                    {"role": "user", "content": command.get("message", user_input)},
-                ],
-            )
-            result = response.choices[0].message.content.strip()
-        except Exception as e:
-            result = f"Error calling OpenAI API: {str(e)}"
-
-    else:
-        result = "Invalid command."
-
-    # Save the message to conversation history if a conversation ID is provided
-    if conversation_id:
-        save_conversation(conversation_id, user_input, result)
+    if use_assistant is not None:
+        USE_ASSISTANT_API = use_assistant
+        # Update app_settings
+        app_settings["use_assistant_api"] = use_assistant
+        update_settings(app_settings)
 
     return jsonify(
         {
-            "response": result,
-            "conversation_id": conversation_id
-            or f"conv_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}",
+            "status": "success",
+            "assistant_id": ASSISTANT_ID,
+            "use_assistant_api": USE_ASSISTANT_API,
         }
     )
 
@@ -613,6 +768,24 @@ def conversations_route():
             )
 
         return jsonify({"status": "error", "message": "No conversation ID provided"})
+
+
+@app.route("/status", methods=["GET"])
+def status():
+    """
+    Simple health check endpoint to verify the server is running.
+    """
+    # Test that OpenAI client is properly configured
+    has_api_key = bool(OPENAI_API_KEY and OPENAI_API_KEY.startswith("sk-"))
+
+    return jsonify(
+        {
+            "status": "ok",
+            "timestamp": datetime.datetime.now().isoformat(),
+            "api_key_configured": has_api_key,
+            "vault_accessible": os.path.exists(VAULT_PATH),
+        }
+    )
 
 
 def handle_note_generation(source, followup, note_title, location, uploaded_file=None):

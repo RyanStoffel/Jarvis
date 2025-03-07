@@ -358,7 +358,7 @@
         flex: 1;
         border: none;
         border-radius: 12px;
-        padding: 14px 90px 14px 16px; /* Add right padding to make room for buttons */
+        padding: 14px 50px 14px 16px;
         font-size: 16px;
         line-height: 1.5;
         resize: none;
@@ -373,32 +373,22 @@
         color: #a0aec0;
       }
 
-      /* Upload button positioning and styling */
       .upload-button {
-        position: absolute;
-        right: 54px; /* Position to the left of send button */
-        bottom: 8px;
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        background: #f3f4f6;
+        background: none;
         border: none;
         cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #4b5563;
+        font-size: 18px;
+        margin-left: 8px;
+        margin-right: 8px;
+        color: #718096;
         transition: all 0.2s;
-        z-index: 2; /* Ensure it's above the textarea */
       }
 
       .upload-button:hover {
-        transform: scale(1.1);
-        background: #e5e7eb;
         color: var(--primary-color);
+        transform: scale(1.1);
       }
 
-      /* Send button positioning and styling */
       .send-button {
         position: absolute;
         right: 8px;
@@ -415,12 +405,15 @@
         color: white;
         transition: all 0.2s;
         box-shadow: 0 2px 5px rgba(58, 123, 213, 0.3);
-        z-index: 2; /* Ensure it's above the textarea */
       }
 
       .send-button:hover {
         transform: scale(1.1);
         box-shadow: 0 2px 8px rgba(58, 123, 213, 0.5);
+      }
+
+      .send-button i {
+        font-size: 16px;
       }
 
       .welcome-screen {
@@ -464,34 +457,6 @@
         margin-bottom: 40px;
         line-height: 1.6;
         color: #555;
-      }
-
-      .settings-help {
-        font-size: 12px;
-        color: #888;
-        margin-top: 4px;
-      }
-
-      #assistant-id-container {
-        margin-top: 12px;
-        margin-bottom: 20px;
-      }
-
-      .command-mode {
-        position: fixed;
-        bottom: 80px;
-        right: 20px;
-        background-color: #f8f9fa;
-        padding: 5px 10px;
-        border-radius: 4px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        font-size: 12px;
-        opacity: 0.8;
-        display: none;
-      }
-
-      .command-mode.active {
-        display: block;
       }
 
       .suggestion-grid {
@@ -801,23 +766,82 @@
         color: #888;
       }
 
-      /* Server status indicator */
-      #server-status {
-        position: fixed;
-        bottom: 10px;
-        right: 10px;
-        padding: 5px 10px;
-        border-radius: 4px;
-        font-size: 12px;
-        z-index: 1000;
-        background-color: #4caf50;
-        color: white;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        transition: all 0.3s ease;
+      /* Input container that holds everything */
+      .input-container {
+        position: relative;
+        display: flex;
+        align-items: center;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        background-color: var(--input-bg);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s;
       }
 
-      #server-status.offline {
-        background-color: #f44336;
+      /* Input field styling */
+      .input-field {
+        flex: 1;
+        border: none;
+        border-radius: 12px;
+        padding: 14px 90px 14px 16px; /* Add right padding to make room for buttons */
+        font-size: 16px;
+        line-height: 1.5;
+        resize: none;
+        height: 52px;
+        max-height: 200px;
+        overflow-y: auto;
+        background-color: transparent;
+        outline: none;
+      }
+
+      /* Upload button positioning and styling */
+      .upload-button {
+        position: absolute;
+        right: 54px; /* Position to the left of send button */
+        bottom: 8px;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: #f3f4f6;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #4b5563;
+        transition: all 0.2s;
+        z-index: 2; /* Ensure it's above the textarea */
+      }
+
+      .upload-button:hover {
+        transform: scale(1.1);
+        background: #e5e7eb;
+        color: var(--primary-color);
+      }
+
+      /* Send button positioning and styling */
+      .send-button {
+        position: absolute;
+        right: 8px;
+        bottom: 8px;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: var(--primary-gradient);
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        transition: all 0.2s;
+        box-shadow: 0 2px 5px rgba(58, 123, 213, 0.3);
+        z-index: 2; /* Ensure it's above the textarea */
+      }
+
+      .send-button:hover {
+        transform: scale(1.1);
+        box-shadow: 0 2px 8px rgba(58, 123, 213, 0.5);
       }
 
       @keyframes typingAnimation {
@@ -1069,23 +1093,11 @@
             </select>
           </div>
           <div class="settings-option toggle-container">
-            <label>Use OpenAI Assistant</label>
+            <label>Compact Mode</label>
             <label class="toggle-switch">
-              <input type="checkbox" id="use-assistant" checked />
+              <input type="checkbox" id="compact-mode" />
               <span class="toggle-slider"></span>
             </label>
-          </div>
-
-          <div class="settings-option" id="assistant-id-container">
-            <label for="assistant-id">Assistant ID</label>
-            <input
-              type="text"
-              id="assistant-id"
-              placeholder="Enter your Assistant ID (asst_...)"
-            />
-            <p class="settings-help">
-              Find this on your OpenAI dashboard under Assistants section
-            </p>
           </div>
         </div>
 
@@ -1114,10 +1126,6 @@
               <span class="toggle-slider"></span>
             </label>
           </div>
-        </div>
-
-        <div id="command-mode" class="command-mode">
-          Command Mode: Using Direct Commands
         </div>
 
         <div class="settings-section">
@@ -1161,9 +1169,6 @@
       </div>
     </div>
 
-    <!-- Server status indicator -->
-    <div id="server-status">Server: Connected</div>
-
     <script>
       // DOM Elements
       const chatDiv = document.getElementById("chat");
@@ -1188,7 +1193,6 @@
       const viewVaultButton = document.getElementById("view-vault");
       const generateNotesButton = document.getElementById("generate-notes");
       const searchVaultButton = document.getElementById("search-vault");
-      const serverStatus = document.getElementById("server-status");
 
       // File upload elements
       const fileInput = document.getElementById("file-input");
@@ -1226,51 +1230,6 @@
 
         // Add file upload suggestion to welcome screen
         addFileUploadSuggestion();
-
-        // Check server status
-        checkServerStatus();
-        setInterval(checkServerStatus, 30000); // Check every 30 seconds
-      }
-
-      // Check server status
-      function checkServerStatus() {
-        fetch("/status", { method: "GET" })
-          .then((response) => {
-            if (!response.ok) {
-              console.error("Server status check failed:", response.statusText);
-              showServerStatus(false);
-            } else {
-              return response.json();
-            }
-          })
-          .then((data) => {
-            if (data && data.status === "ok") {
-              showServerStatus(true, data);
-            } else {
-              showServerStatus(false);
-            }
-          })
-          .catch((error) => {
-            console.error("Server unreachable:", error);
-            showServerStatus(false);
-          });
-      }
-
-      function showServerStatus(isOnline, data) {
-        if (isOnline) {
-          serverStatus.textContent = "Server: Connected";
-          serverStatus.style.backgroundColor = "#4caf50";
-          serverStatus.classList.remove("offline");
-
-          if (data && !data.api_key_configured) {
-            serverStatus.textContent = "Server: API Key Missing";
-            serverStatus.style.backgroundColor = "#ff9800";
-          }
-        } else {
-          serverStatus.textContent = "Server: Disconnected";
-          serverStatus.style.backgroundColor = "#f44336";
-          serverStatus.classList.add("offline");
-        }
       }
 
       // Apply current settings to UI
@@ -1457,18 +1416,11 @@
               method: "POST",
               body: formData,
             })
-              .then((response) => {
-                if (!response.ok) {
-                  throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-              })
+              .then((response) => response.json())
               .then((data) => {
                 if (data.status === "success") {
                   // Remove the temporary upload message
-                  if (chatDiv.lastChild) {
-                    chatDiv.removeChild(chatDiv.lastChild);
-                  }
+                  chatDiv.removeChild(chatDiv.lastChild);
 
                   // Show successful upload message with preview
                   addMessage("user", `Uploaded file: ${file.name}`);
@@ -1484,9 +1436,6 @@
                     text: data.text_preview,
                   };
                 } else {
-                  if (chatDiv.lastChild) {
-                    chatDiv.removeChild(chatDiv.lastChild);
-                  }
                   addMessage(
                     "assistant",
                     `Error processing file: ${data.message}`,
@@ -1495,9 +1444,6 @@
               })
               .catch((error) => {
                 console.error("Error uploading file:", error);
-                if (chatDiv.lastChild) {
-                  chatDiv.removeChild(chatDiv.lastChild);
-                }
                 addMessage("assistant", `Error uploading file: ${error}`);
               });
           }
@@ -1652,9 +1598,6 @@
         inputField.value = "";
         inputField.style.height = "52px";
 
-        // Show typing indicator immediately for better feedback
-        const typingContainer = showTypingIndicator();
-
         fetch("/message", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -1663,44 +1606,14 @@
             conversation_id: currentConversationId,
           }),
         })
-          .then((response) => {
-            // Check if the response is OK
-            if (!response.ok) {
-              throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-          })
+          .then((response) => response.json())
           .then((data) => {
-            // Remove typing indicator
-            if (typingContainer && typingContainer.parentNode) {
-              chatDiv.removeChild(typingContainer);
-            }
-
-            // Check if the response contains an error flag
-            if (data.error) {
-              addMessage("assistant", data.response);
-            } else {
-              typeMessage("assistant", data.response);
-            }
-
+            typeMessage("assistant", data.response);
             if (data.conversation_id) {
               currentConversationId = data.conversation_id;
             }
           })
-          .catch((error) => {
-            console.error("Error sending message:", error);
-
-            // Remove typing indicator if it exists
-            if (typingContainer && typingContainer.parentNode) {
-              chatDiv.removeChild(typingContainer);
-            }
-
-            // Show a user-friendly error message
-            addMessage(
-              "assistant",
-              "I'm having trouble connecting to the server. Please check your internet connection and make sure the Jarvis server is running properly.",
-            );
-          });
+          .catch((error) => addMessage("assistant", "Error: " + error));
       }
 
       // Load conversation history
@@ -1849,141 +1762,6 @@
       // Close conversations panel
       function closeConversationsPanel() {
         conversationsPanel.style.display = "none";
-      }
-
-      // Add these to your existing state variables section
-      let useAssistantApi = true;
-      let assistantId = "";
-
-      // Add this to the applySettings function
-      function applySettings() {
-        // Existing settings code...
-
-        // Set assistant settings
-        document.getElementById("use-assistant").checked = useAssistantApi;
-        document.getElementById("assistant-id").value = assistantId;
-
-        // Show/hide the assistant ID input based on toggle
-        document.getElementById("assistant-id-container").style.display =
-          useAssistantApi ? "block" : "none";
-
-        // Rest of existing settings code...
-      }
-
-      // Add this to your setupEventListeners function
-      function setupEventListeners() {
-        // Existing event listeners...
-
-        // Toggle Assistant ID input visibility
-        document
-          .getElementById("use-assistant")
-          .addEventListener("change", function () {
-            document.getElementById("assistant-id-container").style.display =
-              this.checked ? "block" : "none";
-          });
-
-        // Add command mode indicator for slash commands
-        inputField.addEventListener("input", function () {
-          const commandMode = document.getElementById("command-mode");
-          if (this.value.startsWith("/cmd:")) {
-            commandMode.classList.add("active");
-          } else {
-            commandMode.classList.remove("active");
-          }
-        });
-
-        // Rest of existing event listeners...
-      }
-
-      // Update the saveSettings function
-      function saveSettings() {
-        // Get assistant settings
-        useAssistantApi = document.getElementById("use-assistant").checked;
-        assistantId = document.getElementById("assistant-id").value.trim();
-
-        // Create updated settings object with assistant settings
-        const newSettings = {
-          // Existing settings...
-
-          // Add assistant settings
-          assistant_id: assistantId,
-          use_assistant_api: useAssistantApi,
-
-          // Rest of existing settings...
-        };
-
-        // Update the Assistant settings on the server
-        fetch("/set-assistant", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            assistant_id: assistantId,
-            use_assistant: useAssistantApi,
-          }),
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            console.log("Assistant settings updated:", data);
-          })
-          .catch((error) => {
-            console.error("Error updating assistant settings:", error);
-          });
-
-        // Continue with the existing settings update
-        fetch("/settings", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(newSettings),
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            // Existing success handling...
-          })
-          .catch((error) => {
-            // Existing error handling...
-          });
-      }
-
-      // Add this to the init function to load assistant settings
-      function init() {
-        // Existing initialization code...
-
-        fetch("/settings")
-          .then((response) => response.json())
-          .then((settings) => {
-            userSettings = settings;
-
-            // Load assistant settings
-            if (settings.assistant_id !== undefined) {
-              assistantId = settings.assistant_id;
-            }
-
-            if (settings.use_assistant_api !== undefined) {
-              useAssistantApi = settings.use_assistant_api;
-            }
-
-            applySettings();
-          })
-          .catch((error) => console.error("Error loading settings:", error));
-
-        // Rest of existing initialization code...
-      }
-
-      // Update the sendMessage function to support command mode
-      function sendMessage() {
-        // Existing code...
-
-        // Check if message is in command mode
-        const isCommandMode = text.startsWith("/cmd:");
-
-        // If we're using an assistant but the message starts with /cmd:, indicate command mode
-        if (useAssistantApi && isCommandMode) {
-          document.getElementById("command-mode").classList.add("active");
-        } else {
-          document.getElementById("command-mode").classList.remove("active");
-        }
-
-        // Rest of existing sendMessage code...
       }
 
       // Initialize the app
